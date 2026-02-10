@@ -94,20 +94,20 @@ def list_cultures() -> str:
 
 
 @mcp.tool()
-def convert_culture_to_stellarium(culture_id: str = "", object_name: str = "", date_str: str = "", lat: str = "0", lon: str = "0") -> str:
-    """Converts cultural object & date to coords + Stellarium script. Date formats: 'M:13,0,0,0,0', 'J:200,1,1'."""
+def convert_culture_to_coordinates(culture_id: str = "", object_name: str = "", date_str: str = "", lat: str = "0", lon: str = "0") -> str:
+    """Converts cultural object & date to J2000 coordinates. Date formats: 'M:13,0,0,0,0', 'J:200,1,1'."""
     if not culture_id or not object_name or not date_str:
-        return "❌ Error: culture_id, object_name, and date_str are required"
+        return "Error: culture_id, object_name, and date_str are required"
 
     try:
         # 1. Lookup Object
         culture_data = CULTURAL_LIBRARY.get(culture_id)
         if not culture_data:
-            return f"❌ Error: Culture '{culture_id}' not found"
+            return f"Error: Culture '{culture_id}' not found"
         
         obj_data = culture_data.get("objects", {}).get(object_name)
         if not obj_data:
-            return f"❌ Error: Object '{object_name}' not found in culture '{culture_id}'"
+            return f"Error: Object '{object_name}' not found in culture '{culture_id}'"
         
         modern_id = obj_data.get("modern_id") # e.g. 'mars', 'venus'
         
@@ -124,33 +124,17 @@ def convert_culture_to_stellarium(culture_id: str = "", object_name: str = "", d
         ra_str = str(ra)
         dec_str = str(dec)
         
-        # 4. Generate Stellarium Script
-        script = f"""
-// Stellarium Script for {culture_id} - {object_name}
-// Date: {date_str} -> JD: {jd_val}
-core.setDate("{t.utc_iso()}");
-core.selectObjectByName("{modern_id.capitalize()}", true);
-core.setObserverLocation({lon}, {lat}, 100, 1, "Earth");
-StelMovementMgr.zoomTo(20, 1);
-core.output("Loaded {object_name}");
-"""
-
-        return f"""✅ Success: {object_name} ({modern_id})
+        return f"""Success: {object_name} ({modern_id})
         
-**Scientific Data:**
+Scientific Data:
 - J2000 RA: {ra_str}
 - J2000 Dec: {dec_str}
 - Date (UTC): {t.utc_iso()}
 - Julian Day: {jd_val:.4f}
-
-**Stellarium Script:**
-```javascript
-{script.strip()}
-```
 """
 
     except Exception as e:
-        return f"❌ Error: {str(e)}"
+        return f"Error: {str(e)}"
 
 if __name__ == "__main__":
     mcp.run()

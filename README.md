@@ -1,65 +1,84 @@
-# 🌌 Sky Culture Lite: Archaeoastronomy Computation Engine
+# Sky Culture Lite: Archaeoastronomy Computation Engine
 
-> **Final Year Project Module**: Computational Core for Ancient Sky Simulation
+## Project Context: The Lens vs. The Telescope
 
-[![Python 3.11](https://img.shields.io/badge/python-3.11-blue.svg)](https://www.python.org/downloads/release/python-3110/)
-[![Docker](https://img.shields.io/badge/docker-containerized-blue.svg)](https://www.docker.com/)
-[![MCP](https://img.shields.io/badge/MCP-fastmcp-green.svg)](https://modelcontextprotocol.io/)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+During the development of my Final Year Project, I realized a fundamental inefficiency in how we simulate ancient skies. Instead of building a new "telescope" (simulation engine) every time I needed to switch between Mayan, Chinese, or Egyptian contexts, it made more sense to simply change the "lens."
 
-## 📌 Project Overview
+**Sky Culture Lite** is that lens.
 
-**Sky Culture Lite** is a high-precision archaeoastronomy engine designed as a **Microservice Module** for my Final Year Project. It serves as the bridge between ancient cultural astronomical descriptions and modern scientific coordinates.
+It is a specialized Model Context Protocol (MCP) server that abstracts away the complexity of cultural astronomy. An AI agent can simply ask about a cultural object (like "Chak Ek" or "Yinghuo") and this engine handles the heavy lifting of orbital mechanics, calendar conversion, and coordinate transformation.
 
-This engine leverages **NASA's JPL Ephemeris (DE421)** and **Skyfield** to compute planetary positions for any historical epoch (e.g., Mayan Long Count dates, Ancient Egyptian calendars) and translates them into **J2000 Coordinates** and **Stellarium Scripts** for visualization.
+This modular approach ensures that the core simulation remains stable while the cultural context can be swapped dynamically.
 
-### 🚀 Key Features
-- **Agentic AI Integration**: Built with the **Model Context Protocol (MCP)** to empower AI agents with astronomical calculation capabilities.
-- **High-Precision Physics**: Uses `de421.bsp` (17MB) for accurate planetary positions from 1900 BC to 2050 AD.
-- **Multi-Cultural Calendar Support**:
-  - **Mayan Long Count** (`M:b,k,t,u,k`) -> Modern Date
-  - **Julian/Gregorian** (`J:y,m,d`) -> Modern Date
-- **Stellarium Automation**: Generates verified `.ssc` scripting logic for astronomical simulation.
+## Scientific Basis
 
-## 🛠️ Technology Stack
-- **Core Logic**: Python 3.11
-- **Orbital Mechanics**: `skyfield`, `numpy`
-- **Calendar Math**: `convertdate`
-- **API Protocol**: `fastmcp` (Model Context Protocol)
-- **Deployment**: Docker (Slim image, non-root security)
+This engine is built upon rigorous astronomical standards:
 
-## 📦 Installation & Usage
+*   **JPL DE421 Ephemeris**: Uses NASA's Jet Propulsion Laboratory Development Ephemeris for high-precision planetary positions (1900 BC to 2050 AD).
+*   **IAU WGSN Standards**: Adheres to the naming conventions validated by the International Astronomical Union Working Group on Star Names.
+    *   Reference: [IAU WGSN Bulletin](https://www.pas.rochester.edu/~emamajek/WGSN/WGSN_bulletin1.pdf)
+
+## Technical Architecture
+
+*   **Language**: Python 3.11
+*   **Protocol**: Model Context Protocol (MCP)
+*   **Physics Backend**: Skyfield (State-independent vector astrometry)
+*   **Time Standards**: Barycentric Dynamical Time (TDB) for ephemeris lookups.
+
+## Capabilities
+
+### Multi-Calendar Support
+The engine includes a custom temporal broker capable of parsing non-standard historical date formats:
+*   **Mayan Long Count**: Accepts `M:baktun,katun,tun,winal,kin` (e.g., `M:9,10,0,0,0`).
+*   **Julian Calendar**: Accepts `J:year,month,day` for dates prior to the Gregorian reform (e.g., `J:600,1,1`).
+
+### Coordinate Computation
+Transforms cultural observations into standard J2000 Right Ascension and Declination frames, verifying against the DE421 planetary model.
+
+## Usage
 
 ### 1. Docker (Recommended)
+
+Build the container to isolate the specific Python dependencies and the ephemeris data.
+
 ```bash
 docker build -t sky-culture-lite .
 docker run -i --rm sky-culture-lite
 ```
 
-### 2. Local Python
+### 2. Local Execution
+
 ```bash
 pip install -r requirements.txt
 python server.py
-# Note: First run will download approx 17MB of ephemeris data.
 ```
 
-## 🧩 Module Interaction (MCP Tools)
+## MCP Tools
 
-#### `convert_culture_to_stellarium`
-The primary tool exposed to the AI Agent. It takes a vague cultural description and returns hard scientific data.
+The server exposes the following tools to the specific Agent environment:
+
+### `convert_culture_to_coordinates`
+
+The primary interface for the "lens." It accepts a cultural description and returns scientific coordinates.
+
+**Arguments:**
+*   `culture_id`: The identifier for the cultural context (e.g., "mayan", "chinese_han").
+*   `object_name`: The specific cultural name of the object (e.g., "chak_ek").
+*   `date_str`: The historical date string.
+
+**Example Agent Call:**
 
 ```python
-# Example: "Where was the Great Star (Chak Ek) on Mayan Date 9.10.0.0.0?"
-convert_culture_to_stellarium(
+convert_culture_to_coordinates(
     culture_id="mayan",
     object_name="chak_ek",
     date_str="M:9,10,0,0,0"
 )
 ```
 
-**Returns:**
-- **Scientific Data**: RA/Dec (J2000), Julian Day Number.
-- **Stellarium Script**: Code block to visualize the exact alignment.
+**Return Value:**
+A structured text block containing the computed Julian Day, UTC time, and J2000 RA/Dec coordinates derived from the DE421 ephemeris.
 
----
-*Developed by Nishanth Abimanyu as part of the Final Year Computer Science Project.*
+### `list_cultures`
+
+Returns the catalog of currently loaded cultural contexts available for simulation.

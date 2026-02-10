@@ -49,24 +49,32 @@ To use this engine as a "Lens" for Claude, you must register it in your `claude_
 
 *Note: Replace `nishanthabimanyu/sky-culture-lite` with your local image tag if you haven't pushed to Docker Hub yet (e.g., `sky-culture-lite`).*
 
-## API Reference (MCP Tools)
+## Exposed Functions
 
-### `convert_culture_to_coordinates`
+The server exposes the following function signatures to the Model Context Protocol (MCP) host.
 
-This is the primary lens function. It takes a cultural description and resolves it to a J2000 epoch and coordinate frame.
+### 1. `convert_culture_to_coordinates`
 
-**Parameters:**
-*   `culture_id` (str): The cultural context key (e.g., "mayan", "chinese_han").
-*   `object_name` (str): The native name of the celestial body (e.g., "chak_ek").
-*   `date_str` (str): The historical date.
-    *   **Mayan**: `M:baktun,katun,tun,winal,kin` (e.g., `M:9,10,0,0,0`)
-    *   **Julian**: `J:year,month,day` (e.g., `J:600,1,1`)
+**Signature**: `(culture_id: str, object_name: str, date_str: str) -> str`
 
-**Return Payload:**
-Returns a structured text block containing:
-1.  **Julian Day Number (JD)**: For rigorous time verification.
-2.  **UTC ISO Timestamp**: For standard cross-referencing.
-3.  **J2000 RA/Dec**: Astrometric coordinates aligned with the ICRF.
+This is the primary "Lens" function. It performs the complete translation from a cultural description to a scientific vector.
+
+*   **Inputs**:
+    *   `culture_id`: The target cultural context (e.g., `mayan`, `chinese_han`).
+    *   `object_name`: The native name of the celestial object (e.g., `chak_ek`, `yinghuo`).
+    *   `date_str`: The historical epoch. Supports **Mayan Long Count** (`M:b,k,t,u,k`) and **Julian** (`J:y,m,d`) formats.
+*   **Returns**: 
+    *   Barycentric Dynamical Time (TDB)
+    *   Julian Day Number (JD)
+    *   J2000 Right Ascension & Declination (ICRF)
+
+### 2. `list_cultures`
+
+**Signature**: `() -> str`
+
+Returns a catalog of the currently loaded cultural contexts. This allows the Agent to "survey" the available lenses before selecting one.
+
+*   **Returns**: A formatted list of available Culture IDs and their associated celestial objects.
 
 ## References
 

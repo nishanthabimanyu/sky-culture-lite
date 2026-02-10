@@ -1,14 +1,14 @@
-# Sky Culture MCP Archaeoastronomy Computation Engine
+# Sky Culture Lite: Archaeoastronomy Computation Engine
 
 ## The Philosophy: Changing the Lens, Not the Telescope
 
 In my previous work translating the *Surya Siddhanta*, I spent months manually calculating planetary positions to verify ancient Sanskrit verses against modern ephemerides. It was a tedious, repetitive process of building bespoke simulations for a single cultural context.
 
-When I moved on to Mayan and Chinese astronomy, I realized I was making the same mistake: I was building a new "telescope" (simulation engine) for every culture.
+When I moved on to Mayan and Chinese astronomy for my **Final Year Project**, I realized I was making the same mistake: I was building a new "telescope" (simulation engine) for every culture.
 
-**Sky Culture mcp** represents a shift in architecture. Instead of rebuilding the telescope, I simply changed the lens.
+**Sky Culture Lite** was developed as the solution. It serves as the **core computational module** for the broader project, representing a shift in architecture. Instead of rebuilding the telescope, I simply changed the lens.
 
-This engine serves as a modular "Interchangeable Lens" for AI Agents. It abstracts the complexity of orbital mechanics and calendar systems into a standardized protocol. Whether the input is a Mayan Long Count date or a Han Dynasty star name, this microservice handles the physics, allowing the Agent to focus on the cultural interpretation.
+This modular "Interchangeable Lens" allows AI Agents to abstract the complexity of orbital mechanics. Whether the input is a Mayan Long Count date or a Han Dynasty star name, this microservice handles the physics, allowing the Agent to focus on the cultural interpretation.
 
 ## Technical Architecture
 
